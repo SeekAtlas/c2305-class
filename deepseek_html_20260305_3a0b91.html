@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>C2305 · 班级名册</title>
+    <style>
+        /* 简洁重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #b8a0da, #9f85c5);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* 锁屏卡片 */
+        .lock-card {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 40px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 40px rgba(57, 29, 102, 0.3);
+            text-align: center;
+            border: 2px solid white;
+        }
+
+        .lock-card h1 {
+            font-size: 2.5rem;
+            color: #2d1b4b;
+            margin-bottom: 8px;
+        }
+
+        .lock-card .sub {
+            color: #5e4791;
+            font-size: 1.1rem;
+            border-bottom: 2px dashed #b19bdb;
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #dac7ff;
+            border-radius: 50px;
+            outline: none;
+            text-align: center;
+            margin-bottom: 16px;
+            background: white;
+        }
+
+        .input-field:focus {
+            border-color: #7a53b0;
+        }
+
+        .btn {
+            width: 100%;
+            background: #5a3c92;
+            color: white;
+            border: none;
+            padding: 18px 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 50px;
+            box-shadow: 0 6px 0 #372556;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 2px solid #bba6e6;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #372556;
+        }
+
+        .error-box {
+            background: #ffd1d1;
+            color: #b33a3a;
+            padding: 14px;
+            border-radius: 50px;
+            margin-top: 24px;
+            font-weight: 600;
+            border: 2px solid #ff9f9f;
+            display: none;
+        }
+
+        .error-box.show {
+            display: block;
+        }
+
+        /* 主内容卡片 */
+        .content-card {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 48px;
+            padding: 30px 24px;
+            box-shadow: 0 25px 45px rgba(47, 27, 82, 0.35);
+            border: 2px solid white;
+            display: none;
+        }
+
+        /* 班牌区域 */
+        .class-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            background: #4f3380;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 0 auto 12px;
+            border: 4px solid white;
+            box-shadow: 0 6px 0 #32214f;
+        }
+
+        .class-title h2 {
+            font-size: 2.3rem;
+            color: #271d3a;
+        }
+
+        .class-title p {
+            color: #5a4288;
+            font-size: 1.1rem;
+            background: #ede3ff;
+            padding: 6px 24px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* 姓名网格 - 简单两列，手机优先 */
+        .name-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .name-item {
+            background: #f5edff;
+            padding: 14px 6px;
+            text-align: center;
+            border-radius: 30px 6px 30px 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2b1a48;
+            box-shadow: 4px 4px 0 #b19cd9;
+            border: 2px solid white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 超过4个字的名字允许换行 */
+        .name-item[data-long="true"] {
+            white-space: normal;
+            font-size: 1rem;
+        }
+
+        /* 平板用三列 */
+        @media (min-width: 600px) {
+            .name-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* 电脑用四列 */
+        @media (min-width: 900px) {
+            .name-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: #3e2b60;
+            background: #e7daff;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: 2px dashed #b69fe0;
+            margin-top: 15px;
+        }
+
+        /* 彩蛋弹窗样式 (原生alert, 无需额外) */
+    </style>
+</head>
+<body>
+    <!-- 锁屏界面 -->
+    <div id="lockScreen" class="lock-card">
+        <h1>C2305</h1>
+        <div class="sub">输入密码进入</div>
+        <input type="password" id="passwordInput" class="input-field" placeholder="请输入密码" autocomplete="off">
+        <button class="btn" id="unlockBtn">解锁</button>
+        <div id="errorMessage" class="error-box">❌ 密码错误，请重新输入</div>
+    </div>
+
+    <!-- 主内容 -->
+    <div id="contentScreen" class="content-card">
+        <div class="class-title">
+            <div class="badge">C5</div>
+            <h2>C2305 · 全体同学</h2>
+            <p>👥 共56人</p>
+        </div>
+
+        <div id="nameContainer" class="name-grid"></div>
+
+        <div class="footer">
+            ⭐ 56位 · 一个不少 ⭐
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 核心数据 ----------
+            const PASSWORD = "c230578";      // 正常密码
+            const EASTER_EGG = "zhj";         // 彩蛋密码
+
+            // 完整姓名列表 (包含朱浩军)
+            const NAMES = [
+                "曹梓晨", "曾千叶", "陈佳悦", "陈思远", "孙漠林", "崔若熙", "王雪仪", "邓盛宸", "邓婉婕", "龙润锋",
+                "葛嘉茜", "谷穗", "胡烨", "胡峰泽", "胡嘉昕", "胡瑾瑜", "胡淇翔", "胡雅婷", "黄瑾博", "匡佳蕙",
+                "贺雅婕", "康嘉乐", "李俊驰", "李胜杰", "邓欣瑞", "李依祖", "刘斯曜", "李逸凡", "刘泽轩", "吴佳鑫",
+                "欧阳辰逸", "彭锦霖", "彭鑫怡", "朱硕旋", "王荣轩", "王挺", "王鑫豪", "康恩卓", "王娅璐", "周郅翔",
+                "王梓涵", "危甜喧", "吴英琦", "席浩然", "肖以煊", "肖子韩", "谢斌雅", "赵楚炫", "谢智华", "谢紫璇",
+                "熊诗涵", "姚加贝", "朱浩军", "匡瑜熠", "龙萱雅", "匡晨祎"
+            ];
+
+            // 获取元素
+            const lockScreen = document.getElementById('lockScreen');
+            const contentScreen = document.getElementById('contentScreen');
+            const passwordInput = document.getElementById('passwordInput');
+            const unlockBtn = document.getElementById('unlockBtn');
+            const errorDiv = document.getElementById('errorMessage');
+            const nameContainer = document.getElementById('nameContainer');
+
+            // ---------- 渲染姓名列表 ----------
+            function renderNames() {
+                nameContainer.innerHTML = '';  // 清空
+                NAMES.forEach(name => {
+                    const div = document.createElement('div');
+                    div.className = 'name-item';
+                    div.textContent = name;
+                    // 如果名字长度大于4，标记为长名字，允许换行
+                    if (name.length > 4) {
+                        div.setAttribute('data-long', 'true');
+                    }
+                    nameContainer.appendChild(div);
+                });
+            }
+            renderNames(); // 预先渲染好，只是容器隐藏
+
+            // ---------- 解锁逻辑 ----------
+            function handleUnlock() {
+                const input = passwordInput.value.trim();
+
+                // 彩蛋检测 (输入zhj)
+                if (input === EASTER_EGG) {
+                    alert('👑 网页制作者：朱浩军 👑');
+                    // 清空输入框，隐藏错误提示，保持锁屏
+                    passwordInput.value = '';
+                    errorDiv.classList.remove('show');
+                    return; // 不解锁
+                }
+
+                // 正常密码验证
+                if (input === PASSWORD) {
+                    // 正确：隐藏锁屏，显示内容
+                    lockScreen.style.display = 'none';
+                    contentScreen.style.display = 'block';
+                    errorDiv.classList.remove('show');
+                } else {
+                    // 错误：显示错误提示，清空输入框，晃动一下锁屏卡片
+                    errorDiv.classList.add('show');
+                    // 简单抖动
+                    lockScreen.style.transform = 'translateX(4px)';
+                    setTimeout(() => lockScreen.style.transform = 'translateX(-4px)', 50);
+                    setTimeout(() => lockScreen.style.transform = 'translateX(2px)', 100);
+                    setTimeout(() => lockScreen.style.transform = 'translateX(0)', 150);
+                    
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }
+
+            // 输入时隐藏错误提示
+            passwordInput.addEventListener('input', function() {
+                errorDiv.classList.remove('show');
+            });
+
+            // 点击按钮解锁
+            unlockBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleUnlock();
+            });
+
+            // 回车解锁
+            passwordInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleUnlock();
+                }
+            });
+
+            // 确保初始状态：锁屏显示，主内容隐藏，无错误提示
+            lockScreen.style.display = 'block';
+            contentScreen.style.display = 'none';
+            errorDiv.classList.remove('show');
+            passwordInput.value = '';
+        })();
+    </script>
+</body>
+</html>
